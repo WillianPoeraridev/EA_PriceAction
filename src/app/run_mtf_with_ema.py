@@ -11,6 +11,7 @@ from src.data.binance import fetch_klines
 from src.core.candles import to_csv_rows
 from src.core.mtf import align_on_h1
 from src.core.ta import ema_map_by_close_time, ema_on_closes
+from src.config import settings
 
 def _write_csv(path: str, rows: List[Dict]):
     """Salva lista de dict em CSV (cria a pasta se necessário)."""
@@ -25,8 +26,10 @@ def _write_csv(path: str, rows: List[Dict]):
 
 def main():
      # 1) Argumentos
-    symbol = sys.argv[1] if len(sys.argv) > 1 else "BTCUSDT"
+    symbol = sys.argv[1] if len(sys.argv) > 1 else settings.DEFAULT_SYMBOL
     limit_h1 = int(sys.argv[2]) if len(sys.argv) > 2 else 300
+    OUT = settings.OUTPUT_DIR
+
 
     # 2) Baixar SPOT
     print(f"[SPOT] Baixando {limit_h1} candles H1 de {symbol}...")
@@ -37,10 +40,10 @@ def main():
     w  = fetch_klines(symbol, "1w", max(30,  limit_h1//168 + 10))
 
     # 3) Salvar CSVs “crus” (opcional; serve para auditoria)
-    _write_csv(f"data/{symbol}_1h.csv", to_csv_rows(h1))
-    _write_csv(f"data/{symbol}_4h.csv", to_csv_rows(h4))
-    _write_csv(f"data/{symbol}_1d.csv", to_csv_rows(d))
-    _write_csv(f"data/{symbol}_1w.csv", to_csv_rows(w))
+    _write_csv(f"{OUT}/{symbol}_1h.csv", to_csv_rows(h1))
+    _write_csv(f"{OUT}/{symbol}_4h.csv", to_csv_rows(h4))
+    _write_csv(f"{OUT}/{symbol}_1d.csv", to_csv_rows(d))
+    _write_csv(f"{OUT}/{symbol}_1w.csv", to_csv_rows(w))
 
     # 4) EMAs por timeframe
     h1_e20 = ema_on_closes(h1, 20); h1_e50 = ema_on_closes(h1, 50)
@@ -72,7 +75,7 @@ def main():
         })
 
     # 7) Salvar mesclado
-    out = f"data/{symbol}_mtf_with_ema.csv"
+    out = f"{OUT}/{symbol}_mtf_with_ema.csv"
     _write_csv(out, rows)
     print(f"Pronto! Escrevi: {out}")
     print("Exemplo (últimas 3 linhas):")

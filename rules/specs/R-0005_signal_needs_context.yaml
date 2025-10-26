@@ -1,0 +1,16 @@
+id: R-0005
+name: Signal Needs Context (heurística)
+status: draft
+references:
+  - docs/brooks/Book1_Trends/Ch04.md
+intent: "Evitar validar padrões isolados sem força/construção prévia no mesmo sentido."
+inputs: [bar_type, recent_strength]
+parameters:
+  min_recent_trend_bars: 2   # quantos trend bars recentes na direção sugerida
+logic: |
+  Um 'high2' ou 'low2' isolado não é suficiente se 'recent_strength' < min_recent_trend_bars.
+labels:
+  - name: context_ok
+    type: bool
+notes: |
+  'recent_strength' pode ser: contagem de trend_bull/bear nas últimas N barras.

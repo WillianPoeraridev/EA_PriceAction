@@ -1,0 +1,24 @@
+id: R-0002
+name: Tight Range Detector (H1, janela deslizante)
+status: draft
+references:
+  - docs/brooks/Book1_Trends/Ch03.md
+intent: "Identificar janelas de consolidação apertada para evitar breakouts de baixa qualidade."
+inputs: [h1_high, h1_low, h1_open, h1_close]
+parameters:
+  window: 10            # N barras
+  overlap_min: 0.6      # K: fração mínima de barras com sobreposição
+  range_factor_max: 2.0 # tau: (max_high - min_low) / avg_range < tau
+  body_ratio_max: 0.3   # ajuda a caracterizar barras pequenas/indecisas
+logic: |
+  Para as últimas N barras:
+    avg_range = mean(high-low)
+    big_span  = (max_high - min_low)
+    prop_small_body = mean( |close-open|/(high-low) < body_ratio_max )
+    prop_overlap = fração de pares adjacentes com sobreposição de intervalos
+  is_tight_range = (big_span/avg_range < range_factor_max) AND (prop_overlap >= overlap_min) AND (prop_small_body >= 0.5)
+labels:
+  - name: is_tight_range
+    type: bool
+notes: |
+  Implementação v0 usa proxies simples de 'aperto' e 'overlap' para manter o sinal objetivo e barato de calcular.

@@ -28,7 +28,10 @@ from urllib.error import HTTPError, URLError
 
 BASE = "https://api.binance.com"
 
+from urllib.error import HTTPError, URLError
+
 def _get(path: str, params: dict) -> list:
+    # Faz requisição GET ao endpoint Binance e retorna o JSON decodificado.
     qs = urlencode(params)
     url = f"{BASE}{path}?{qs}"
     req = Request(url, headers={"User-Agent": settings.USER_AGENT})
@@ -37,11 +40,9 @@ def _get(path: str, params: dict) -> list:
             data = resp.read()
         text = data.decode("utf-8")
         obj = json.loads(text)
-        # Proteção: Binance pode responder 'null' (JSON None) em casos esporádicos
         if obj is None:
             print(f"[WARN] Binance retornou 'null' para {url}")
             return []
-        # Em erro, a API responde um objeto {code,message}; tratamos como vazio e logamos
         if not isinstance(obj, list):
             print(f"[WARN] Resposta inesperada para {url}: {text[:200]}")
             return []
@@ -55,7 +56,6 @@ def _get(path: str, params: dict) -> list:
     except Exception as e:
         print(f"[ERROR] {url} -> {e}")
         return []
-
 
 def fetch_klines(symbol: str, interval: str, limit: int = 500) -> List[Candle]:
     """

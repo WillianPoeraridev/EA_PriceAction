@@ -90,18 +90,19 @@ def main():
 
     # carregar merged + H1 OHLC (para calcular métricas de candle)
     merged = pd.read_csv(in_csv)
-    h1 = pd.read_csv(f"{settings.OUTPUT_DIR}/{symbol}_1h.csv")
-    # trazer OHLC do H1 para o merged (chave: close_time_ms do H1 == t_close_h1 no merged)
-    h1_ren = h1.rename(columns={
+    h1 = pd.read_csv(f"{settings.OUTPUT_DIR}/{symbol}_1h.csv")      # carregar H1
+    h1_ren = h1.rename(columns={                                    # renomear colunas para evitar conflito
         "open":"h1_open","high":"h1_high","low":"h1_low",
         "close_time_ms":"t_close_h1"
     })[["t_close_h1","h1_open","h1_high","h1_low"]]
     df = pd.merge(merged, h1_ren, on="t_close_h1", how="left")
-    
-    # --- Sanity check (COLE AQUI) ---
+
+    # sanity-check opcional
     required = {"h1_close", "h1_open", "h1_high", "h1_low"}
     missing = sorted(list(required - set(df.columns)))
-    assert not missing, f"Faltando colunas: {missing}. Disponíveis: {list(df.columns)}"
+    if missing:
+        raise KeyError(f"Faltando colunas: {missing}. Disponíveis: {list(df.columns)}")
+
     # -------------------------------
 
     # parâmetros v0 (poderão vir de YAML futuramente)

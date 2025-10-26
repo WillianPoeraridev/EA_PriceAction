@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Env
+.env
+*.env
+
+# Dados/artefatos
+data/*.csv
+data/*.parquet
+logs/

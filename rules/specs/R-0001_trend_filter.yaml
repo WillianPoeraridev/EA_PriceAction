@@ -1,0 +1,29 @@
+id: R-0001
+name: Trend Filter (Brooks v0)
+status: draft
+references:
+  - docs/brooks/Book1_Trends/Ch01.md
+intent: "Operar compras no H1 somente quando D/W em alta (EMA20 > EMA50)."
+context:
+  timeframes:
+    execution: H1
+    higher: [H4, D, W]
+inputs: [close, ema20, ema50]
+parameters:
+  d_ema_align: above
+  w_ema_align: above
+  h4_conflict_ok: false
+logic:
+  regime:
+    - require: (D.ema20 > D.ema50) AND (W.ema20 > W.ema50)
+    - optional: (H4.ema20 >= H4.ema50)  # se h4_conflict_ok=false, vira require
+  entry_window:
+    - execution_tf: H1
+    - gate: pullback_to(H1.ema20) AND bull_signal_bar
+invalidations:
+  - D.ema20 < D.ema50 OR W.ema20 < W.ema50
+risk:
+  stop: below_recent_swing
+  target: 1.0R-1.5R
+notes: |
+  Versão inicial simplificada; refinar "respeitar EMA" e definição de barra sinal.

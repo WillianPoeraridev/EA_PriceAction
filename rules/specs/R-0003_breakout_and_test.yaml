@@ -1,0 +1,23 @@
+id: R-0003
+name: Breakout + Test (H1)
+status: draft
+references:
+  - docs/brooks/Book1_Trends/Ch03.md
+intent: "Marcar rompimentos além da máxima/mínima de M barras e acompanhar teste/pullback."
+inputs: [h1_high, h1_low, h1_close]
+parameters:
+  lookback_M: 20
+  delta_pct: 0.0   # exigir ultrapassar em % (0 no v0)
+logic: |
+  max_prev = max(high[ -M : -1 ])
+  min_prev = min(low [ -M : -1 ])
+  thr_up   = max_prev * (1 + delta_pct)
+  thr_dn   = min_prev * (1 - delta_pct)
+  if h1_high > thr_up:  bo_dir = "up"
+  elif h1_low < thr_dn: bo_dir = "down"
+  else: bo_dir = "none"
+labels:
+  - name: bo_dir
+    type: enum  # up, down, none
+notes: |
+  O acompanhamento de 'teste' (retorno à área do BO) entra na v1 do anotador.

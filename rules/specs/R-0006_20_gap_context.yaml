@@ -1,0 +1,19 @@
+id: R-0006
+name: 20-Gap-Bar Context (H1/EMA20)
+status: draft
+references:
+  - docs/brocks/Book1_Trends/Ch06.md
+intent: "Identificar condição de 'longe da EMA20' por muitos candles, sugerindo teste/recuo."
+inputs: [h1_close, h1_ema20]
+parameters:
+  window: 10
+  gap_min_ratio: 0.01   # |close - ema20|/ema20 >= 1%
+logic: |
+  gap_signs = sinal(h1_close - h1_ema20) nas últimas 'window' barras
+  consis = 'todos iguais' (ou maioria forte) E |close-ema20|/ema20 >= gap_min_ratio
+  is_20_gap_context = consis
+labels:
+  - name: is_20_gap_context
+    type: bool
+notes: |
+  v0 simplificado; versões futuras podem usar ATR para normalizar distância.

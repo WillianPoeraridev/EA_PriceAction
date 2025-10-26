@@ -1,0 +1,15 @@
+# --- App ---
+DEFAULT_SYMBOL=BTCUSDT
+OUTPUT_DIR=data
+TIMEZONE=UTC
+HTTP_TIMEOUT_SEC=30
+HTTP_USER_AGENT=ea-pa-v1/0.2
+
+# --- Trading (Spot) ---
+TRADING_MODE=paper         # paper | live
+FEES_BPS=10                # 10 bps = 0,10% (ajuste depois)
+SLIPPAGE_BPS=0
+
+# --- Exchange keys (só quando formos operar de verdade) ---
+BINANCE_API_KEY=
+BINANCE_API_SECRET=

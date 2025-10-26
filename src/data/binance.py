@@ -23,19 +23,40 @@ from urllib.parse import urlencode
 from urllib.request import urlopen, Request
 import json
 from src.core.candles import Candle, from_binance_klines_row
+from src.config import settings
+from urllib.error import HTTPError, URLError
+
 BASE = "https://api.binance.com"
+
+from urllib.error import HTTPError, URLError
+
 def _get(path: str, params: dict) -> list:
-    """
-    Requisição HTTP simples (GET) que retorna o JSON como lista Python.
-    - path: ex. "/api/v3/klines"
-    - params: dicionário com query string (ex.: {"symbol":"BTCUSDT","interval":"1h"})
-    """
+    # Faz requisição GET ao endpoint Binance e retorna o JSON decodificado.
     qs = urlencode(params)
     url = f"{BASE}{path}?{qs}"
-    req = Request(url, headers={"User-Agent":"ea-pa-v1/0.2"})
-    with urlopen(req, timeout=30) as resp:
-        data = resp.read()
-    return json.loads(data.decode("utf-8"))
+    req = Request(url, headers={"User-Agent": settings.USER_AGENT})
+    try:
+        with urlopen(req, timeout=settings.HTTP_TIMEOUT_SEC) as resp:
+            data = resp.read()
+        text = data.decode("utf-8")
+        obj = json.loads(text)
+        if obj is None:
+            print(f"[WARN] Binance retornou 'null' para {url}")
+            return []
+        if not isinstance(obj, list):
+            print(f"[WARN] Resposta inesperada para {url}: {text[:200]}")
+            return []
+        return obj
+    except HTTPError as e:
+        print(f"[HTTP {e.code}] {url} -> {e.reason}")
+        return []
+    except URLError as e:
+        print(f"[URL ERROR] {url} -> {e}")
+        return []
+    except Exception as e:
+        print(f"[ERROR] {url} -> {e}")
+        return []
+
 def fetch_klines(symbol: str, interval: str, limit: int = 500) -> List[Candle]:
     """
     Baixa os últimos `limit` candles para `symbol` e `interval`.

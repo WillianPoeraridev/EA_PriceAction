@@ -1,0 +1,24 @@
+id: R-0001
+name: Trend/Doji Bar Classifier (H1)
+status: draft
+references:
+  - docs/brooks/Book1_Trends/Ch01.md
+  - docs/brooks/Book1_Trends/Ch02.md
+intent: "Classificar cada barra H1 como trend_bull, trend_bear ou doji, para uso em filtros e gatilhos."
+inputs: [h1_open, h1_high, h1_low, h1_close]
+parameters:
+  body_ratio_min: 0.3    # θ1: |close-open| / (high-low) >= 0.3 ⇒ trend bar
+logic: |
+  body = abs(h1_close - h1_open)
+  rng  = max(1e-12, h1_high - h1_low)
+  body_ratio = body / rng
+  if h1_close > h1_open and body_ratio >= body_ratio_min: bar_type = "trend_bull"
+  elif h1_close < h1_open and body_ratio >= body_ratio_min: bar_type = "trend_bear"
+  else: bar_type = "doji"
+labels:
+  - name: body_ratio
+    type: float
+  - name: bar_type
+    type: enum   # trend_bull, trend_bear, doji
+notes: |
+  body_ratio_min pode ser calibrado por ativo/timeframe.

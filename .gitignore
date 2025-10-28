@@ -9,7 +9,12 @@ __pycache__/
 .env
 *.env
 
+# artefatos locais
+review_pack.zip
+
 # Dados/artefatos
 data/*.csv
 data/*.parquet
 logs/
+data/*.json
+data/*.png
